@@ -12,6 +12,7 @@ const studentInfoColumns = ref([
   { name: 'grade', label: '학년', field: 'grade', align: 'center' }
 ])
 
+const clickedRowData = ref({})
 const fnClickSearch = () => {
   console.log(buildParam())
 }
@@ -29,8 +30,9 @@ const fnClickReset = () => {
   searchParam.grade = 1
 }
 
-const fnClickRow = (params) => {
-  console.log(params.rows)
+const fnClickRow = (event, param) => {
+  clickedRowData.value = param
+  console.log(clickedRowData.value)
 }
 
 onMounted(() => {
@@ -119,7 +121,7 @@ onMounted(() => {
         :rows="studentInfoList"
         :columns="studentInfoColumns"
         @row-click="fnClickRow"
-        row-key="id"
+        row-key="index"
       />
     </div>
   </div>
