@@ -7,7 +7,9 @@ const professorName = ref('')
 
 const router = useRouter()
 const fnLogin = () => {
-  console.log(professorId.value, professorName.value)
+  // 로그인 판별
+  console.log('run login ')
+  // 페이지 이동
   router.push({ name: 'Main' })
 }
 </script>

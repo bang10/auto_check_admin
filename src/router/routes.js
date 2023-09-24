@@ -11,6 +11,21 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: () => import('layouts/common/ProfessorLogin.vue')
+  },
+  {
+    path: '/manage/student',
+    name: 'ManageStudent',
+    component: () => import('layouts/StudentManage.vue')
+  },
+  {
+    path: '/manage/schedule',
+    name: 'ManageSchedule',
+    component: () => import('layouts/ScheduleManage.vue')
+  },
+  {
+    path: '/manage/attendance',
+    name: 'ManageAttendance',
+    component: () => import('layouts/AttendanceManage.vue')
   }
 
   // Always leave this as last one,
