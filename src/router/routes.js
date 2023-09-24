@@ -15,7 +15,8 @@ const routes = [
   {
     path: '/manage/student',
     name: 'ManageStudent',
-    component: () => import('layouts/StudentManage.vue')
+    component: () => import('layouts/StudentManage.vue'),
+    props: true
   },
   {
     path: '/manage/schedule',
@@ -25,7 +26,8 @@ const routes = [
   {
     path: '/manage/attendance',
     name: 'ManageAttendance',
-    component: () => import('layouts/AttendanceManage.vue')
+    component: () => import('layouts/AttendanceManage.vue'),
+    props: true
   }
 
   // Always leave this as last one,

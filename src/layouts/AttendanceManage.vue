@@ -1,13 +1,17 @@
-<template>
+<script setup>
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-</template>
+const selectedStudentId = ref('12')
 
-<script>
-export default {
-  name: "AttendanceManage"
-}
+onMounted(() => {
+  const route = useRoute()
+  selectedStudentId.value = route.query.studentId
+})
 </script>
 
-<style scoped>
-
-</style>
+<template>
+  <div class="full-width">
+    {{ selectedStudentId }}
+  </div>
+</template>

@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref } from 'vue'
 
 const searchParam = reactive({})
 // 서버로부터 받아온 학생 데이터
@@ -14,7 +14,25 @@ const studentInfoColumns = ref([
 
 const clickedRowData = ref({})
 const fnClickSearch = () => {
-  console.log(buildParam())
+  if (validation()) {
+    console.log(buildParam())
+  }
+}
+
+const validation = () => {
+  if (searchParam.studentId) {
+    if (!/^[0-9]+$/.test(searchParam.studentId)) {
+      alert('학번은 숫자만 입력해 주세요.')
+      return false
+    }
+  }
+  if (searchParam.grade) {
+    if (!/^[1-6]+$/.test(searchParam.grade)) {
+      alert('학년은 숫자만 입력해 주세요.')
+      return false
+    }
+  }
+  return true
 }
 
 const buildParam = () => {
@@ -33,6 +51,9 @@ const fnClickReset = () => {
 const fnClickRow = (event, param) => {
   clickedRowData.value = param
   console.log(clickedRowData.value)
+  nextTick(() => {
+    window.open('/manage/attendance?studentId=' + param.studentId)
+  })
 }
 
 onMounted(() => {
