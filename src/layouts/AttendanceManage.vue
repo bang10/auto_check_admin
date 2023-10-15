@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
-const selectedStudentId = ref('12')
+const selectedStudentId = ref('')
 
 onMounted(() => {
   const route = useRoute()

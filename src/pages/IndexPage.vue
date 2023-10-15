@@ -1,17 +1,17 @@
-<template>
-  <q-page class="flex flex-center">
-    <img
-      alt="Quasar logo"
-      src="~assets/quasar-logo-vertical.svg"
-      style="width: 200px; height: 200px"
-    >
-  </q-page>
-</template>
+<script setup>
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-<script>
-import { defineComponent } from 'vue'
+const getData = ref(null)
 
-export default defineComponent({
-  name: 'IndexPage'
+onMounted(() => {
+  const route = useRoute()
+  getData.value = {
+    division: route.query.division,
+    name: route.query.name,
+    id: route.query.id
+  }
+
+  console.log(getData.value)
 })
 </script>
