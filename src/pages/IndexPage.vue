@@ -1,16 +1,12 @@
 <script setup>
-import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { onBeforeMount, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const getData = ref(null)
 
-onMounted(() => {
-  const route = useRoute()
-  getData.value = {
-    division: route.query.division,
-    name: route.query.name,
-    id: route.query.id
-  }
+onBeforeMount(() => {
+  const router = useRouter()
+  getData.value = router.currentRoute.value.query
 
   console.log(getData.value)
 })

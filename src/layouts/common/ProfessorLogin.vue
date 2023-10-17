@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router'
 
 const professorId = ref('')
 const professorName = ref('')
-const loginData = ref(null)
+const loginData = ref()
 
 const router = useRouter()
 
@@ -17,7 +17,6 @@ const fnLogin = async () => {
   api.post('/ysu/admin/login', buildParam())
     .then((res) => {
       loginData.value = res.data.result
-      console.log(loginData.value)
       if (loginData.value) {
         alert(loginData.value.division + ' 권한으로 로그인합니다.')
         router.push({ name: 'Index', query: { division: loginData.value.division, name: loginData.value.name, id: loginData.value.professorId } })
