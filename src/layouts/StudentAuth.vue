@@ -1,6 +1,7 @@
 <script setup>
 import { nextTick, onMounted, reactive, ref, watchEffect } from 'vue'
 import { api } from 'boot/axios'
+import { useStore } from 'vuex'
 
 const searchParam = reactive({})
 const selectedItem = ref([])
@@ -13,64 +14,76 @@ const studentInfoColumns = ref([
   { name: 'grade', label: '학년', field: 'grade', align: 'center' },
   { name: 'isStudentInfo', label: '인증여부', field: 'isStudentInfo', align: 'center' }
 ])
-
+const userStore = useStore()
 const clickedRowData = ref({})
 
 const fnClickSearch = () => {
-  const param = searchBuildParam()
-  api.get('/ysu/admin/auth/student/list', { params: param })
-    .then((res) => {
-      studentInfoList.value = res.data.result.map((item, index) => {
-        return {
-          index: index + 1,
-          isStudentInfo: item.isStudent ? '인증' : '미인증',
-          ...item
-        }
+  if (userStore.getters.getLoginData.division === '관리자') {
+    const param = searchBuildParam()
+    api.get('/ysu/admin/auth/student/list', { params: param })
+      .then((res) => {
+        studentInfoList.value = res.data.result.map((item, index) => {
+          return {
+            index: index + 1,
+            isStudentInfo: item.isStudent ? '인증' : '미인증',
+            ...item
+          }
+        })
+        console.log(studentInfoList.value)
       })
-      console.log(studentInfoList.value)
-    })
-    .catch((err) => {
-      alert(err)
-    })
+      .catch((err) => {
+        alert(err)
+      })
+  } else {
+    alert('권한이 없습니다.')
+  }
 }
 
 const fnDoAuth = () => {
-  if (selectedItem.value.length === 0) {
-    alert('한명 이상 선택해 주세요.')
+  if (userStore.getters.getLoginData.division === '관리자') {
+    if (selectedItem.value.length === 0) {
+      alert('한명 이상 선택해 주세요.')
+    } else {
+      console.log(buildParam('auth'))
+      api.post('/ysu/admin/update/student/statue', buildParam('auth'))
+        .then((res) => {
+          if (res.data.result > 0) {
+            alert('학생인증 처리가 되었습니다.')
+            selectedItem.value = []
+            fnClickSearch()
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          alert('오류가 발생했습니다.')
+        })
+    }
   } else {
-    console.log(buildParam('auth'))
-    api.post('/ysu/admin/update/student/statue', buildParam('auth'))
-      .then((res) => {
-        if (res.data.result > 0) {
-          alert('학생인증 처리가 되었습니다.')
-          selectedItem.value = []
-          fnClickSearch()
-        }
-      })
-      .catch((err) => {
-        console.error(err)
-        alert('오류가 발생했습니다.')
-      })
+    alert('권한이 없습니다.')
   }
 }
 
 const fnCancelAuth = () => {
-  if (selectedItem.value.length === 0) {
-    alert('한명 이상 선택해 주세요.')
+  if (userStore.getters.getLoginData.division === '관리자') {
+    if (selectedItem.value.length === 0) {
+      alert('한명 이상 선택해 주세요.')
+    } else {
+      console.log(buildParam('cancel'))
+      api.post('/ysu/admin/update/student/statue', buildParam('cancel'))
+        .then((res) => {
+          if (res.data.result > 0) {
+            alert('학생인증을 취소했습니다.')
+            selectedItem.value = []
+            fnClickSearch()
+          }
+        })
+        .catch((err) => {
+          console.error(err)
+          alert('오류가 발생했습니다.')
+        })
+    }
   } else {
-    console.log(buildParam('cancel'))
-    api.post('/ysu/admin/update/student/statue', buildParam('cancel'))
-      .then((res) => {
-        if (res.data.result > 0) {
-          alert('학생인증을 취소했습니다.')
-          selectedItem.value = []
-          fnClickSearch()
-        }
-      })
-      .catch((err) => {
-        console.error(err)
-        alert('오류가 발생했습니다.')
-      })
+    alert('권한이 없습니다.')
   }
 }
 
@@ -103,11 +116,15 @@ const fnClickReset = () => {
 }
 
 const fnClickRow = (event, param) => {
-  clickedRowData.value = param
-  console.log(clickedRowData.value)
-  nextTick(() => {
-    window.open('/manage/attendance?studentId=' + param.studentId)
-  })
+  if (userStore.getters.getLoginData.division === '관리자') {
+    clickedRowData.value = param
+    console.log(clickedRowData.value)
+    nextTick(() => {
+      window.open('/manage/attendance?studentId=' + param.studentId)
+    })
+  } else {
+    alert('권한이 없습니다.')
+  }
 }
 
 watchEffect(() => {
@@ -120,7 +137,11 @@ watchEffect(() => {
 })
 
 onMounted(() => {
-  fnClickSearch()
+  if (userStore.getters.getLoginData.division === '관리자') {
+    fnClickSearch()
+  } else {
+    alert('권한이 없습니다.')
+  }
 })
 </script>
 
