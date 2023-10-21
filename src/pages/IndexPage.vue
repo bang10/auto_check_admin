@@ -58,10 +58,12 @@ onBeforeMount(() => {
           @click="toggleLeftDrawer"
         />
 
-        <q-toolbar-title>
+        <q-toolbar-title v-if="selectTitle">
           연성대학교 [{{ selectTitle }}]
         </q-toolbar-title>
-
+        <q-toolbar-title v-if="!selectTitle">
+          연성대학교
+        </q-toolbar-title>
         <div>
           {{ getData.name }}({{ getData.division }})님
         </div>

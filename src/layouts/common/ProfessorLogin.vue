@@ -15,7 +15,7 @@ const validate = {
   id: [val => !!val || '빈칸일 수 없습니다.'],
   password: [val => !!val || '빈칸일 수 없습니다.']
 }
-const fnLogin = async () => {
+const fnLogin = () => {
   api.post('/ysu/admin/login', buildParam())
     .then((res) => {
       loginData.value = res.data.result
@@ -27,7 +27,8 @@ const fnLogin = async () => {
         alert('일치하는 정보가 없습니다.')
       }
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error(err)
       alert('일치하는 정보가 없습니다.')
     })
 }
