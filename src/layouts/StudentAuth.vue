@@ -1,51 +1,105 @@
 <script setup>
-import { nextTick, onMounted, reactive, ref } from 'vue'
+import { nextTick, onMounted, reactive, ref, watchEffect } from 'vue'
+import { api } from 'boot/axios'
 
 const searchParam = reactive({})
-// 서버로부터 받아온 학생 데이터
-// 아래 샘플 데이터 있습니다.
+const selectedItem = ref([])
 const studentInfoList = ref([])
 const studentInfoColumns = ref([
   { name: 'index', label: '순서', field: 'index', align: 'center' },
-  { name: 'name', label: '이름', field: 'name', align: 'center' },
+  { name: 'studentName', label: '이름', field: 'studentName', align: 'center' },
   { name: 'studentId', label: '학번', field: 'studentId', align: 'center' },
-  { name: 'grade', label: '학년', field: 'grade', align: 'center' }
+  { name: 'department', label: '학년', field: 'department', align: 'center' },
+  { name: 'grade', label: '학년', field: 'grade', align: 'center' },
+  { name: 'isStudentInfo', label: '인증여부', field: 'isStudentInfo', align: 'center' }
 ])
 
 const clickedRowData = ref({})
+
 const fnClickSearch = () => {
-  if (validation()) {
-    console.log(buildParam())
+  const param = searchBuildParam()
+  api.get('/ysu/admin/auth/student/list', { params: param })
+    .then((res) => {
+      studentInfoList.value = res.data.result.map((item, index) => {
+        return {
+          index: index + 1,
+          isStudentInfo: item.isStudent ? '인증' : '미인증',
+          ...item
+        }
+      })
+      console.log(studentInfoList.value)
+    })
+    .catch((err) => {
+      alert(err)
+    })
+}
+
+const fnDoAuth = () => {
+  if (selectedItem.value.length === 0) {
+    alert('한명 이상 선택해 주세요.')
+  } else {
+    console.log(buildParam('auth'))
+    api.post('/ysu/admin/update/student/statue', buildParam('auth'))
+      .then((res) => {
+        if (res.data.result > 0) {
+          alert('학생인증 처리가 되었습니다.')
+          selectedItem.value = []
+          fnClickSearch()
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+        alert('오류가 발생했습니다.')
+      })
   }
 }
 
-const validation = () => {
-  if (searchParam.studentId) {
-    if (!/^[0-9]+$/.test(searchParam.studentId)) {
-      alert('학번은 숫자만 입력해 주세요.')
-      return false
-    }
+const fnCancelAuth = () => {
+  if (selectedItem.value.length === 0) {
+    alert('한명 이상 선택해 주세요.')
+  } else {
+    console.log(buildParam('cancel'))
+    api.post('/ysu/admin/update/student/statue', buildParam('cancel'))
+      .then((res) => {
+        if (res.data.result > 0) {
+          alert('학생인증을 취소했습니다.')
+          selectedItem.value = []
+          fnClickSearch()
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+        alert('오류가 발생했습니다.')
+      })
   }
-  if (searchParam.grade) {
-    if (!/^[1-6]+$/.test(searchParam.grade)) {
-      alert('학년은 숫자만 입력해 주세요.')
-      return false
-    }
-  }
-  return true
 }
 
-const buildParam = () => {
+const searchBuildParam = () => {
   return {
     studentId: searchParam.studentId,
-    name: searchParam.studentName,
+    studentName: searchParam.studentName,
     grade: searchParam.grade
   }
 }
+
+const buildParam = (type) => {
+  if (type !== 'cancel') {
+    return {
+      statue: 'S',
+      studentIdList: selectedItem.value.map(item => item.studentId)
+    }
+  } else {
+    return {
+      statue: 'C',
+      studentIdList: selectedItem.value.map(item => item.studentId)
+    }
+  }
+}
+
 const fnClickReset = () => {
   searchParam.studentName = ''
-  searchParam.studentId = ''
-  searchParam.grade = 1
+  searchParam.studentId = undefined
+  searchParam.grade = undefined
 }
 
 const fnClickRow = (event, param) => {
@@ -56,15 +110,17 @@ const fnClickRow = (event, param) => {
   })
 }
 
+watchEffect(() => {
+  if (searchParam.studentId) {
+    searchParam.studentId = searchParam.studentId.replace(/[^0-9]/g, '')
+  }
+  if (searchParam.grade) {
+    searchParam.grade = searchParam.grade.replace(/[^0-9]/g, '')
+  }
+})
+
 onMounted(() => {
-  studentInfoList.value = [
-    { index: 1, name: 'name', studentId: '12345', grade: 1 },
-    { index: 2, name: 'name', studentId: '12345', grade: 1 },
-    { index: 3, name: 'name', studentId: '12345', grade: 1 },
-    { index: 4, name: 'name', studentId: '12345', grade: 1 },
-    { index: 5, name: 'name', studentId: '12345', grade: 1 },
-    { index: 6, name: 'name', studentId: '12345', grade: 1 }
-  ]
+  fnClickSearch()
 })
 </script>
 
@@ -85,7 +141,6 @@ onMounted(() => {
                     v-model="searchParam.studentName"
                     dense
                     outlined
-                    rounded
                     style="width: 200px;"
                   />
 
@@ -97,7 +152,6 @@ onMounted(() => {
                     v-model="searchParam.studentId"
                     dense
                     outlined
-                    rounded
                     style="width: 200px;"
                   />
 
@@ -109,7 +163,6 @@ onMounted(() => {
                     v-model="searchParam.grade"
                     dense
                     outlined
-                    rounded
                     style="width: 200px;"
                   />
                 </q-item>
@@ -134,7 +187,7 @@ onMounted(() => {
         @click="fnClickReset"
       />
     </div>
-    <div class="full-width q-ma-lg">
+    <div class="full-width q-ma-lg" style="max-height: 500px; overflow-y: auto;">
       <q-table
         title="검색결과"
         flat
@@ -142,8 +195,50 @@ onMounted(() => {
         :rows="studentInfoList"
         :columns="studentInfoColumns"
         @row-click="fnClickRow"
+        selection="multiple"
+        v-model:selected="selectedItem"
         row-key="index"
-      />
+      >
+        <template #top-left>
+          <q-item
+            style="font-size: 20px;"
+            head
+          >
+            검색결과 : {{ studentInfoList.length }}개
+          </q-item>
+        </template>
+
+        <template #top-right>
+          <q-btn
+            class="btn-style"
+            style="background-color: #5555ec;"
+            dense
+            flat
+            color="white"
+            @click="fnDoAuth"
+            label="학생인증"
+          />
+
+          <q-btn
+            class="q-ml-lg btn-style"
+            style="background-color: #ff8800;"
+            dense
+            flat
+            color="white"
+            @click="fnCancelAuth"
+          >
+            학생인증취소
+          </q-btn>
+        </template>
+      </q-table>
     </div>
   </div>
 </template>
+
+<style scoped>
+.btn-style {
+  height: auto;
+  width: 100px;
+  font-size: 16px;
+}
+</style>

@@ -1,6 +1,6 @@
 import { boot } from 'quasar/wrappers'
 import axios from 'axios'
-const api = axios.create({ baseURL: 'https://a633-14-35-203-26.ngrok-free.app' }, { withCredentials: true })
+const api = axios.create({ baseURL: 'http://localhost:8999' }, { withCredentials: true })
 
 export default boot(({ app }) => {
   // for use inside Vue files (Options API) through this.$axios and this.$api
