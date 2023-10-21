@@ -27,8 +27,7 @@ const fnLogin = async () => {
         alert('일치하는 정보가 없습니다.')
       }
     })
-    .catch((err) => {
-      alert(err)
+    .catch(() => {
       alert('일치하는 정보가 없습니다.')
     })
 }

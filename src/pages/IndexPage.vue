@@ -2,18 +2,20 @@
 import { onBeforeMount, reactive, ref } from 'vue'
 import { useStore } from 'vuex'
 import EssentialLink from 'components/EssentialLink.vue'
+import { useRouter } from 'vue-router'
 
 let getData = reactive(null)
 const leftDrawerOpen = ref(false)
 const userStore = useStore()
+const router = useRouter()
 
 const linksList = [
   {
-    title: '학생인증',
+    title: '학생인증(관리자)',
     link: '/auth/student'
   },
   {
-    title: '시간표 관리',
+    title: '시간표 관리(관리자)',
     link: '/manage/schedule'
   },
   {
@@ -31,7 +33,7 @@ const toggleLeftDrawer = () => {
 }
 
 const fnLogout = () => {
-  console.log('Clicked logout button')
+  router.push({ name: 'Login' })
 }
 
 onBeforeMount(() => {
@@ -71,7 +73,7 @@ onBeforeMount(() => {
         </div>
       </q-toolbar>
     </q-header>
-
+    <router-view></router-view>
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
@@ -84,11 +86,13 @@ onBeforeMount(() => {
 
         </q-item-label>
 
-        <EssentialLink
+        <router-link
           v-for="link in linksList"
           :key="link.title"
-          v-bind="link"
-        />
+          :to="link.link"
+        >
+          <EssentialLink :link="link.link" :title="link.title" />
+        </router-link>
       </q-list>
     </q-drawer>
   </q-layout>
