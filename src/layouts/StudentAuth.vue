@@ -71,53 +71,53 @@ onMounted(() => {
 <template>
   <div class="full-width">
     <!-- 컨텐즈 -->
-    <div class="q-mt-sm">
-      <div class="q-pa-sm row">
-        <div class="col-12">
-          <div class="q-pa-md">
-            <div class="row">
-              <q-item class="q-pa-none items-center col-12 flex justify-center">
+      <div class="q-mt-sm">
+        <div class="q-pa-sm row">
+          <div class="col-12">
+            <div class="q-pa-md">
+              <div class="row">
+                <q-item class="q-pa-none items-center col-12 flex justify-center">
                   <span class="title flex items-center">
                     학생명
                   </span>
-                <q-input
-                  class="q-ml-sm"
-                  v-model="searchParam.studentName"
-                  dense
-                  outlined
-                  rounded
-                  style="width: 200px;"
-                />
+                  <q-input
+                    class="q-ml-sm"
+                    v-model="searchParam.studentName"
+                    dense
+                    outlined
+                    rounded
+                    style="width: 200px;"
+                  />
 
-                <span class="title flex items-center q-ml-sm">
+                  <span class="title flex items-center q-ml-sm">
                     학번
                   </span>
-                <q-input
-                  class="q-ml-sm"
-                  v-model="searchParam.studentId"
-                  dense
-                  outlined
-                  rounded
-                  style="width: 200px;"
-                />
+                  <q-input
+                    class="q-ml-sm"
+                    v-model="searchParam.studentId"
+                    dense
+                    outlined
+                    rounded
+                    style="width: 200px;"
+                  />
 
-                <span class="title flex items-center q-ml-sm">
+                  <span class="title flex items-center q-ml-sm">
                     학년
                   </span>
-                <q-input
-                  class="q-ml-sm"
-                  v-model="searchParam.grade"
-                  dense
-                  outlined
-                  rounded
-                  style="width: 200px;"
-                />
-              </q-item>
+                  <q-input
+                    class="q-ml-sm"
+                    v-model="searchParam.grade"
+                    dense
+                    outlined
+                    rounded
+                    style="width: 200px;"
+                  />
+                </q-item>
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
 
     <div class="justify-center row">
       <q-btn

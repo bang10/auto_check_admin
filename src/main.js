@@ -1,4 +1,4 @@
-import { createApp, provide } from 'vue'
+import { createApp } from 'vue'
 import App from 'src/App.vue'
 import store from 'src/store/index'
 

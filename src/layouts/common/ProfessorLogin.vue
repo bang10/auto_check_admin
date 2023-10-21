@@ -1,5 +1,6 @@
 <script setup>
 import { ref } from 'vue'
+// import { useStore } from 'vuex'
 import { api } from 'boot/axios'
 import { useRouter } from 'vue-router'
 
@@ -18,6 +19,8 @@ const fnLogin = async () => {
     .then((res) => {
       loginData.value = res.data.result
       if (loginData.value) {
+        // const store = useStore()
+        // store.commit('updateData', loginData.value)
         alert(loginData.value.division + ' 권한으로 로그인합니다.')
         router.push({ name: 'Index', query: { division: loginData.value.division, name: loginData.value.name, id: loginData.value.professorId } })
       } else {

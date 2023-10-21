@@ -5,33 +5,42 @@ const routes = [
     component: () => import('layouts/MainLayout.vue')
   },
   {
-    path: '/index',
-    name: 'Index',
-    component: () => import('pages/IndexPage.vue'),
-    props: true
-  },
-  {
     path: '/login',
     name: 'Login',
     component: () => import('layouts/common/ProfessorLogin.vue'),
     props: true
   },
   {
-    path: '/manage/student',
-    name: 'ManageStudent',
-    component: () => import('layouts/StudentManage.vue'),
-    props: true
-  },
-  {
-    path: '/manage/schedule',
-    name: 'ManageSchedule',
-    component: () => import('layouts/ScheduleManage.vue')
-  },
-  {
-    path: '/manage/attendance',
-    name: 'ManageAttendance',
-    component: () => import('layouts/AttendanceManage.vue'),
-    props: true
+    path: '/index',
+    name: 'Index',
+    component: () => import('pages/IndexPage.vue'),
+    props: true,
+    children: [
+      {
+        path: '/auth/student',
+        name: 'AuthStudent',
+        component: () => import('layouts/StudentAuth.vue'),
+        props: true
+      },
+      {
+        path: '/manage/student',
+        name: 'ManageStudent',
+        component: () => import('layouts/StudentManage.vue'),
+        props: true
+      },
+      {
+        path: '/manage/schedule',
+        name: 'ManageSchedule',
+        component: () => import('layouts/ScheduleManage.vue'),
+        props: true
+      },
+      {
+        path: '/manage/attendance',
+        name: 'ManageAttendance',
+        component: () => import('layouts/AttendanceManage.vue'),
+        props: true
+      }
+    ]
   }
 
   // Always leave this as last one,
