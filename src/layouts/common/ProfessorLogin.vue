@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-// import { useStore } from 'vuex'
+import { useStore } from 'vuex'
 import { api } from 'boot/axios'
 import { useRouter } from 'vue-router'
 
@@ -9,6 +9,7 @@ const professorName = ref('')
 const loginData = ref()
 
 const router = useRouter()
+const store = useStore()
 
 const validate = {
   id: [val => !!val || '빈칸일 수 없습니다.'],
@@ -19,15 +20,15 @@ const fnLogin = async () => {
     .then((res) => {
       loginData.value = res.data.result
       if (loginData.value) {
-        // const store = useStore()
-        // store.commit('updateData', loginData.value)
+        store.commit('updateData', loginData.value)
         alert(loginData.value.division + ' 권한으로 로그인합니다.')
-        router.push({ name: 'Index', query: { division: loginData.value.division, name: loginData.value.name, id: loginData.value.professorId } })
+        router.push({ name: 'Index' })
       } else {
         alert('일치하는 정보가 없습니다.')
       }
     })
-    .catch(() => {
+    .catch((err) => {
+      alert(err)
       alert('일치하는 정보가 없습니다.')
     })
 }
