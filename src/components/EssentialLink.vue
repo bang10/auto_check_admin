@@ -1,5 +1,6 @@
 <template>
   <q-item
+    style="color: black;"
     clickable
     :href="link"
   >

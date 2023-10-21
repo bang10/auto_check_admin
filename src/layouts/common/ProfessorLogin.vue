@@ -41,7 +41,7 @@ const buildParam = () => {
 </script>
 
 <template>
-    <div class="q-pa-md justify-center content" style="height: 50%; width: 20%">
+    <div class="q-pa-md justify-center content" style="bottom: 20%; width: 20%;">
 
       <q-form
         @submit="fnLogin"

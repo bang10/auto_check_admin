@@ -28,6 +28,11 @@ const linksList = [
   }
 ]
 
+const selectTitle = ref('')
+const selectMenu = (param) => {
+  selectTitle.value = param
+}
+
 const toggleLeftDrawer = () => {
   leftDrawerOpen.value = !leftDrawerOpen.value
 }
@@ -54,7 +59,7 @@ onBeforeMount(() => {
         />
 
         <q-toolbar-title>
-          연성대학교
+          연성대학교 [{{ selectTitle }}]
         </q-toolbar-title>
 
         <div>
@@ -73,7 +78,7 @@ onBeforeMount(() => {
         </div>
       </q-toolbar>
     </q-header>
-    <router-view></router-view>
+
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
@@ -90,10 +95,23 @@ onBeforeMount(() => {
           v-for="link in linksList"
           :key="link.title"
           :to="link.link"
+          @click="selectMenu(link.title)"
         >
           <EssentialLink :link="link.link" :title="link.title" />
         </router-link>
       </q-list>
     </q-drawer>
+    <div class="router-content">
+      <div class="row justify-end">
+        <router-view class="q-mt-md" v-if="leftDrawerOpen" style="max-width: 85%;"></router-view>
+        <router-view class="q-mt-md" v-if="!leftDrawerOpen"></router-view>
+      </div>
+    </div>
   </q-layout>
 </template>
+
+<style scoped>
+.router-content {
+  padding: 16px;
+}
+</style>
