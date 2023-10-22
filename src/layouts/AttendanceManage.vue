@@ -7,6 +7,7 @@ const selectedStudentId = ref('')
 const searchParam = reactive({})
 const attendanceList = ref([])
 const attendanceStudentList = ref([])
+const selectStudentList = ref([])
 
 const attendanceStudentColumns = ref([
   { name: 'cnt', label: '순서', field: 'cnt', align: 'center' },
@@ -20,18 +21,31 @@ const attendanceStudentColumns = ref([
 ])
 
 // 출석
-const fnAttendance = () => {
-
+const fnAttendance = (param) => {
+  if (selectStudentList.value.length === 0) {
+    alert('한명이상 선택해 주세요.')
+  } else {
+    api.post('/ysu/admin/update/attendance', buildParam(param))
+      .then((res) => {
+        alert(res.data.result + '건 변경에 성공했습니다.')
+        selectStudentList.value = []
+        fnSearch()
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+  }
 }
 
-// 지각
-const fnLate = () => {
-
-}
-
-// 결석
-const fnAbsence = () => {
-
+const buildParam = (type) => {
+  return {
+    code: type,
+    attendanceDivisionId: selectStudentList.value.map(item => ({
+      studentId: item.studentId,
+      subjectName: item.subjectName,
+      scheduleDay: item.scheduleDay
+    }))
+  }
 }
 
 const searchBuildParam = () => {
@@ -284,7 +298,8 @@ onMounted(async () => {
         :rows="attendanceStudentList"
         :columns="attendanceStudentColumns"
         selection="multiple"
-        row-key="index"
+        row-key="cnt"
+        v-model:selected="selectStudentList"
       >
         <template #top-left>
           <q-item
@@ -302,7 +317,7 @@ onMounted(async () => {
             dense
             flat
             color="white"
-            @click="fnAttendance"
+            @click="fnAttendance('A01')"
             label="출석처리"
           />
 
@@ -312,7 +327,7 @@ onMounted(async () => {
             dense
             flat
             color="white"
-            @click="fnLate"
+            @click="fnAttendance('A02')"
             label="지각처리"
           />
 
@@ -322,7 +337,7 @@ onMounted(async () => {
             dense
             flat
             color="white"
-            @click="fnAbsence"
+            @click="fnAttendance('A03')"
             label="결석처리"
           />
         </template>
