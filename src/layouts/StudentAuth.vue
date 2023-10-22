@@ -107,6 +107,7 @@ const fnClickReset = () => {
   searchParam.studentName = ''
   searchParam.studentId = undefined
   searchParam.grade = undefined
+  searchParam.isStudent = true
 
   fnClickSearch()
 }
@@ -182,7 +183,7 @@ onMounted(() => {
                   />
 
                 <span class="title flex items-center q-ml-sm">
-                    강의요일
+                    인증여부
                 </span>
                   <q-select
                     class="q-ml-sm q-mr-lg"
