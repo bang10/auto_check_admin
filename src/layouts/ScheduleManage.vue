@@ -213,7 +213,7 @@ onMounted(() => {
         @click="fnClickReset"
       />
     </div>
-    <div class="full-width q-ma-lg">
+    <div class="full-width q-ma-lg" style="max-height: 500px; overflow-y: auto;">
       <q-table
         title="검색결과"
         flat
