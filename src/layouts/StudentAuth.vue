@@ -29,7 +29,6 @@ const fnClickSearch = () => {
             ...item
           }
         })
-        console.log(studentInfoList.value)
       })
       .catch((err) => {
         alert(err)
@@ -68,7 +67,6 @@ const fnCancelAuth = () => {
     if (selectedItem.value.length === 0) {
       alert('한명 이상 선택해 주세요.')
     } else {
-      console.log(buildParam('cancel'))
       api.post('/ysu/admin/update/student/statue', buildParam('cancel'))
         .then((res) => {
           if (res.data.result > 0) {
@@ -158,8 +156,10 @@ onMounted(() => {
                     학생명
                   </span>
                   <q-input
-                    class="q-ml-sm"
+                    class="q-ml-sm q-mr-lg"
                     v-model="searchParam.studentName"
+                    filled
+                    use-input
                     dense
                     outlined
                     style="width: 200px;"
@@ -169,8 +169,10 @@ onMounted(() => {
                     학번
                   </span>
                   <q-input
-                    class="q-ml-sm"
+                    class="q-ml-sm q-mr-lg"
                     v-model="searchParam.studentId"
+                    filled
+                    use-input
                     dense
                     outlined
                     style="width: 200px;"
@@ -182,6 +184,8 @@ onMounted(() => {
                   <q-input
                     class="q-ml-sm"
                     v-model="searchParam.grade"
+                    filled
+                    use-input
                     dense
                     outlined
                     style="width: 200px;"
