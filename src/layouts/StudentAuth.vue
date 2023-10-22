@@ -111,6 +111,8 @@ const fnClickReset = () => {
   searchParam.studentName = ''
   searchParam.studentId = undefined
   searchParam.grade = undefined
+
+  fnClickSearch()
 }
 
 const fnClickRow = (event, param) => {

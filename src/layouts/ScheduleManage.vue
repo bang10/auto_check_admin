@@ -92,6 +92,8 @@ const fnClickReset = () => {
   searchParam.scheduleDay = undefined
   searchParam.classroom = undefined
   searchParam.professorName = undefined
+
+  fnClickSearch()
 }
 
 const fnClickRow = (event, param) => {
