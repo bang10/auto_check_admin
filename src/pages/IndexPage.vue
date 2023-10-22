@@ -11,16 +11,12 @@ const router = useRouter()
 
 const linksList = [
   {
-    title: '학생인증(관리자)',
-    link: '/auth/student'
-  },
-  {
     title: '시간표 관리(관리자)',
     link: '/manage/schedule'
   },
   {
     title: '학생관리',
-    link: '/manage/student'
+    link: '/auth/student'
   },
   {
     title: '출석관리',
