@@ -15,7 +15,7 @@ const attendanceStudentColumns = ref([
   { name: 'grade', label: '학년', field: 'grade', align: 'center' },
   { name: 'subjectName', label: '교과명', field: 'subjectName', align: 'center' },
   { name: 'tranceScheduleDay', label: '강의요일', field: 'tranceScheduleDay', align: 'center' },
-  { name: 'attendanceTime', label: '출석시간', field: 'attendanceTime', align: 'center' },
+  { name: 'tranceTime', label: '출석시간', field: 'tranceTime', align: 'center' },
   { name: 'tranceAttendance', label: '출석여부', field: 'tranceAttendance', align: 'center' }
 ])
 
@@ -53,6 +53,7 @@ const fnSearch = () => {
           cnt: index + 1,
           tranceScheduleDay: tranceDate(item.scheduleDay),
           tranceAttendance: attendanceAbsence(item.isAttendance),
+          tranceTime: fnTranceTime(item.attendanceTime),
           ...item
         }
       })
@@ -87,6 +88,17 @@ const getAttendance = async () => {
     .catch((err) => {
       console.error(err)
     })
+}
+
+const fnTranceTime = (param) => {
+  const date = new Date(param)
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hours = String(date.getHours()).padStart(2, '0')
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+
+  return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
 // TODO Map으로 변경
