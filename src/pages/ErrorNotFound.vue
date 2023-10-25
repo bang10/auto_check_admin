@@ -6,7 +6,7 @@
       </div>
 
       <div class="text-h2" style="opacity:.4">
-        Oops. Nothing here...
+        존재하지 않는 페이지
       </div>
 
       <q-btn
@@ -14,7 +14,7 @@
         color="white"
         text-color="blue"
         unelevated
-        to="/"
+        to="/login"
         label="Go Home"
         no-caps
       />

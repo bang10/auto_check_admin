@@ -1,3 +1,5 @@
+// import { createRouter, createWebHistory } from 'vue-router'
+
 const routes = [
   {
     path: '/main',
@@ -9,6 +11,11 @@ const routes = [
     name: 'Login',
     component: () => import('layouts/common/ProfessorLogin.vue'),
     props: true
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('pages/ErrorNotFound.vue')
   },
   {
     path: '/index',
@@ -50,5 +57,10 @@ const routes = [
   //   component: () => import('pages/ErrorNotFound.vue')
   // }
 ]
+
+// const router = createRouter({
+//   history: createWebHistory(),
+//   routes
+// })
 
 export default routes

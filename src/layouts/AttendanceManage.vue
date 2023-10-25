@@ -215,7 +215,6 @@ onMounted(async () => {
                 outlined
                 style="width: 200px;"
               />
-
               <span class="title flex items-center">
                 학년
               </span>
@@ -228,7 +227,6 @@ onMounted(async () => {
                 outlined
                 style="width: 200px;"
               />
-
               <span class="title flex items-center">
                 강의날짜
               </span>
@@ -255,7 +253,8 @@ onMounted(async () => {
                   </q-icon>
                 </template>
               </q-input>
-
+            </q-item>
+            <q-item class="q-pa-none items-center col-12 flex justify-center">
               <span class="title flex items-center">
                 출석
               </span>
