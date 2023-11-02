@@ -34,12 +34,16 @@ const fnLogin = () => {
           isLogin.value = true
           alert('관리자 인증을 해주세요.')
         } else {
+          professorId.value = ''
+          professorName.value = ''
           alert('일치하는 정보가 없습니다.')
         }
       }
     })
     .catch((err) => {
       console.error(err)
+      professorId.value = ''
+      professorName.value = ''
       alert('일치하는 정보가 없습니다.')
     })
 }
@@ -66,7 +70,6 @@ const fnSendAuthNumber = () => {
 }
 
 const fnCheckAuthNumber = () => {
-  console.log(authNumber.value, checkAuthNumber.value)
   if (authNumber.value.toString() === checkAuthNumber.value) {
     store.commit('updateData', loginData.value)
     alert(loginData.value.division + ' 권한으로 로그인합니다.')
