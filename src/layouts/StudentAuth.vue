@@ -35,6 +35,7 @@ const fnClickSearch = () => {
           ...item
         }
       })
+      console.log(studentInfoList.value)
     })
     .catch((err) => {
       alert(err)

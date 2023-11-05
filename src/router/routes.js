@@ -46,6 +46,12 @@ const routes = [
         name: 'ManageAttendance',
         component: () => import('layouts/AttendanceManage.vue'),
         props: true
+      },
+      {
+        path: '/total/statistics',
+        name: 'TotalStatistics',
+        component: () => import('layouts/TotalStatistics.vue'),
+        props: true
       }
     ]
   }

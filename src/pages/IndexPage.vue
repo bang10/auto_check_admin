@@ -21,6 +21,10 @@ const linksList = [
   {
     title: '출석관리',
     link: '/manage/attendance'
+  },
+  {
+    title: '통계(개발중)',
+    link: '/total/statistics'
   }
 ]
 

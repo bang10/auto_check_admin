@@ -115,7 +115,6 @@ const fnTranceTime = (param) => {
   return `${year}-${month}-${day} ${hours}:${minutes}`
 }
 
-// TODO Map으로 변경
 const attendanceAbsence = (param) => {
   if (param === 'A01') {
     return '출석'

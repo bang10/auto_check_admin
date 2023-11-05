@@ -5,8 +5,6 @@ import { useStore } from 'vuex'
 
 const searchParam = reactive({})
 const userStore = useStore()
-// 서버로부터 받아온 학생 데이터
-// 아래 샘플 데이터 있습니다.
 const scheduleList = ref([])
 const scheduleInfoColumns = ref([
   { name: 'index', label: '순서', field: 'index', align: 'center' },
