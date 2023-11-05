@@ -109,8 +109,9 @@ onMounted(() => {
         title="일별통계"
         flat
         bordered
-        :colums="statisticsColumns"
+        :columns="statisticsColumns"
         :rows="dailyRateList"
+        row-key="index"
       >
         <template #top-left>
           <span class="title flex items-center q-ml-sm">
@@ -146,8 +147,9 @@ onMounted(() => {
         title="월별통계"
         flat
         bordered
-        :colums="statisticsColumns"
+        :columns="statisticsColumns"
         :rows="monthRateList"
+        row-key="index"
       >
         <template #top-left>
           <span class="title flex items-center q-ml-sm">
@@ -183,8 +185,9 @@ onMounted(() => {
         title="년별통계"
         flat
         bordered
-        :colums="statisticsColumns"
         :rows="yearRateList"
+        :columns="statisticsColumns"
+        row-key="index"
       >
         <template #top-left>
           <span class="title flex items-center q-ml-sm">
