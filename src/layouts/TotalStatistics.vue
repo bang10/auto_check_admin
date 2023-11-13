@@ -1,5 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from 'vue'
+import { api } from 'boot/axios'
 
 const options = ref({
   professor: [],
@@ -9,9 +10,9 @@ const dailyRateList = ref([])
 const monthRateList = ref([])
 const yearRateList = ref([])
 const searchParam = reactive({})
-
+const selectedYear = ref(new Date().getFullYear())
 const fnClickSearch = () => {
-  alert(searchParam.subjectName)
+  console.log('subject', searchParam.subjectName, 'professor', searchParam.professorName)
 }
 
 const fnClickReset = () => {
@@ -22,13 +23,43 @@ const statisticsColumns = ref([
   { name: 'index', label: '순서', field: 'index', align: 'center' },
   { name: 'day', label: '날짜', field: 'day', align: 'center' },
   { name: 'subjectName', label: '교과명', field: 'subjectName', align: 'center' },
-  { name: 'attendance', label: '출석', field: 'attendance', align: 'center' },
+  { name: 'attendance', label: '출석횟수', field: 'attendance', align: 'center' },
   { name: 'attendanceRate', label: '출석율(%)', field: 'attendanceRate', align: 'center' },
-  { name: 'perceptual', label: '지각', field: 'perceptual', align: 'center' },
+  { name: 'perceptual', label: '지각횟수', field: 'perceptual', align: 'center' },
   { name: 'perceptualRate', label: '지각율(%)', field: 'perceptualRate', align: 'center' },
-  { name: 'absent', label: '결석', field: 'absent', align: 'center' },
+  { name: 'absent', label: '결석횟수', field: 'absent', align: 'center' },
   { name: 'absentRate', label: '결석율(%)', field: 'absentRate', align: 'center' }
 ])
+
+const getSubjectList = () => {
+  api.get('/ysu/user/subject/list')
+    .then((res) => {
+      options.value.subject = res.data.result.map(item => {
+        return {
+          label: item.name,
+          value: item.subjectId
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+const getProfessorList = () => {
+  api.get('/ysu/professor/list')
+    .then((res) => {
+      options.value.professor = res.data.result.map(item => {
+        return {
+          label: item.name,
+          value: item.professorId
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
 
 // TODO Test data. You have to change below code and get only through API
 onMounted(() => {
@@ -44,6 +75,8 @@ onMounted(() => {
     { index: 1, day: '2023', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' },
     { index: 2, day: '2024', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' }
   ]
+  getSubjectList()
+  getProfessorList()
 })
 </script>
 
@@ -196,12 +229,15 @@ onMounted(() => {
           <q-input
             class="q-ml-sm q-mr-lg"
             v-model="searchParam.year"
+            mask="date"
+            :default-year-month="[selectedYear, 1]"
+            :range="[1900, new Date().getFullYear()]"
+            :navigation="false"
             readonl
             filled
             use-input
             dense
             outlined
-            mask="date"
           >
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
