@@ -105,6 +105,8 @@ const reDataSetting = (param) => {
 const fnClickReset = () => {
   searchParam.professorCode = undefined
   searchParam.subjectCode = undefined
+  searchParam.date = undefined
+  convertDate.value = undefined
 }
 const statisticsColumns = ref([
   { name: 'index', label: '순서', field: 'index', align: 'center' },
@@ -261,7 +263,7 @@ watchEffect(() => {
           <q-input
             class="q-ml-sm q-mr-lg"
             v-model="convertDate"
-            readonl
+            readonly
             filled
             use-input
             dense
