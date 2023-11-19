@@ -28,7 +28,7 @@ const fnLogin = () => {
       if (loginWay.value === 'professor') {
         store.commit('updateData', loginData.value)
         alert(loginData.value.division + ' 권한으로 로그인합니다.')
-        router.push({ name: 'Index' })
+        router.push({ name: 'TotalStatistics' })
       } else {
         if (loginData.value) {
           isLogin.value = true
@@ -99,7 +99,7 @@ watchEffect(() => {
 </script>
 
 <template>
-    <div class="q-pa-md justify-center content" style="bottom: 20%; width: 20%;">
+    <div class="q-pa-md justify-center row" style="bottom: 20%; width: 20%; margin-left: 40%; margin-top: 10%">
 
       <q-form
         @submit="fnLogin"
