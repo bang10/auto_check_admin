@@ -26,7 +26,8 @@ const fnClickSearch = () => {
           perceptual: item.perceptual,
           perceptualRate: item.perceptualRate,
           absent: item.absent,
-          absentRate: item.absentRate
+          absentRate: item.absentRate,
+          total: item.attendance + item.perceptual + item.absent
         }
       })
     })
@@ -41,11 +42,6 @@ const reSetting = (data) => {
     const perceptual = item.attDetails.find(detail => detail.attendanceAbsenceId === 'A02')
     const absent = item.attDetails.find(detail => detail.attendanceAbsenceId === 'A03')
 
-    console.log('item: ', item)
-    console.log('attendance: ', attendance)
-    console.log('perceptual: ', perceptual)
-    console.log('absent: ', absent)
-
     const formatRate = (rate) => {
       if (typeof rate === 'number') {
         return Math.round(rate * 100 * 100) / 100 // 100을 곱하고 소수 둘째 자리에서 반올림
@@ -56,12 +52,12 @@ const reSetting = (data) => {
     return {
       date: item.date,
       subjectName: item.subjectName,
-      attendance: attendance ? attendance.cntAttendance : '-',
-      attendanceRate: formatRate(attendance ? attendance.ratio : '-'),
-      perceptual: perceptual ? perceptual.cntAttendance : '-',
-      perceptualRate: formatRate(perceptual ? perceptual.ratio : '-'),
-      absent: absent ? absent.cntAttendance : '-',
-      absentRate: formatRate(absent ? absent.ratio : '-')
+      attendance: attendance ? attendance.cntAttendance : 0,
+      attendanceRate: formatRate(attendance ? attendance.ratio : 0),
+      perceptual: perceptual ? perceptual.cntAttendance : 0,
+      perceptualRate: formatRate(perceptual ? perceptual.ratio : 0),
+      absent: absent ? absent.cntAttendance : 0,
+      absentRate: formatRate(absent ? absent.ratio : 0)
 
     }
   })
@@ -117,7 +113,8 @@ const statisticsColumns = ref([
   { name: 'perceptual', label: '지각횟수', field: 'perceptual', align: 'center' },
   { name: 'perceptualRate', label: '지각율(%)', field: 'perceptualRate', align: 'center' },
   { name: 'absent', label: '결석횟수', field: 'absent', align: 'center' },
-  { name: 'absentRate', label: '결석율(%)', field: 'absentRate', align: 'center' }
+  { name: 'absentRate', label: '결석율(%)', field: 'absentRate', align: 'center' },
+  { name: 'total', label: '총합', field: 'total', align: 'center' }
 ])
 
 const getSubjectList = () => {
