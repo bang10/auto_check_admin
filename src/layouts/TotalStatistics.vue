@@ -1,27 +1,116 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, watchEffect } from 'vue'
 import { api } from 'boot/axios'
 
 const options = ref({
   professor: [],
-  subject: []
+  subject: [],
+  selectDateType: [
+    { label: '일별', value: 'day' },
+    { label: '월별', value: 'month' },
+    { label: '년별', value: 'year' }
+  ]
 })
-const dailyRateList = ref([])
-const monthRateList = ref([])
-const yearRateList = ref([])
+const statisticsRateList = ref([])
 const searchParam = reactive({})
-const selectedYear = ref(new Date().getFullYear())
 const fnClickSearch = () => {
-  console.log('subject', searchParam.subjectName, 'professor', searchParam.professorName)
+  api.get('/ysu/admin/total/statistics', { params: searchParam })
+    .then((res) => {
+      statisticsRateList.value = reSetting(reDataSetting(res.data.result)).map((item, index) => {
+        return {
+          index: index + 1,
+          date: item.date,
+          subjectName: item.subjectName,
+          attendance: item.attendance,
+          attendanceRate: item.attendanceRate,
+          perceptual: item.perceptual,
+          perceptualRate: item.perceptualRate,
+          absent: item.absent,
+          absentRate: item.absentRate
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+const reSetting = (data) => {
+  return data.map(item => {
+    const attendance = item.attDetails.find(detail => detail.attendanceAbsenceId === 'A01')
+    const perceptual = item.attDetails.find(detail => detail.attendanceAbsenceId === 'A02')
+    const absent = item.attDetails.find(detail => detail.attendanceAbsenceId === 'A03')
+
+    console.log('item: ', item)
+    console.log('attendance: ', attendance)
+    console.log('perceptual: ', perceptual)
+    console.log('absent: ', absent)
+
+    const formatRate = (rate) => {
+      if (typeof rate === 'number') {
+        return Math.round(rate * 100 * 100) / 100 // 100을 곱하고 소수 둘째 자리에서 반올림
+      }
+      return '-'
+    }
+
+    return {
+      date: item.date,
+      subjectName: item.subjectName,
+      attendance: attendance ? attendance.cntAttendance : '-',
+      attendanceRate: formatRate(attendance ? attendance.ratio : '-'),
+      perceptual: perceptual ? perceptual.cntAttendance : '-',
+      perceptualRate: formatRate(perceptual ? perceptual.ratio : '-'),
+      absent: absent ? absent.cntAttendance : '-',
+      absentRate: formatRate(absent ? absent.ratio : '-')
+
+    }
+  })
+}
+
+const reDataSetting = (param) => {
+  const groupedData = param.reduce((acc, item) => {
+    const key = `${item.date}_${item.subjectName}`
+
+    acc[key] = acc[key] || { items: [], total: 0 }
+
+    acc[key].items.push({ attendanceAbsenceId: item.attendanceAbsenceId, cntAttendance: parseInt(item.cntAttendance, 10) })
+    acc[key].total += parseInt(item.cntAttendance, 10)
+
+    return acc
+  }, {})
+
+  const result = Object.entries(groupedData).map(([key, { items, total }]) => {
+    const ratio = items.reduce((acc, { attendanceAbsenceId, cntAttendance }) => {
+      acc[attendanceAbsenceId] = cntAttendance / total
+      return acc
+    }, {})
+
+    const [date, subjectName] = key.split('_')
+    return { date, subjectName, ratio }
+  })
+
+  const mergedResult = result.map(resItem => {
+    const existingData = param.filter(item => item.date === resItem.date && item.subjectName === resItem.subjectName)
+
+    const attDetails = existingData.map(item => ({
+      attendanceAbsenceId: item.attendanceAbsenceId,
+      cntAttendance: parseInt(item.cntAttendance, 10),
+      ratio: resItem.ratio[item.attendanceAbsenceId] || 0
+    }))
+
+    return { date: resItem.date, subjectName: resItem.subjectName, attDetails }
+  })
+
+  return mergedResult
 }
 
 const fnClickReset = () => {
-  searchParam.professorName = undefined
-  searchParam.subjectName = undefined
+  searchParam.professorCode = undefined
+  searchParam.subjectCode = undefined
 }
 const statisticsColumns = ref([
   { name: 'index', label: '순서', field: 'index', align: 'center' },
-  { name: 'day', label: '날짜', field: 'day', align: 'center' },
+  { name: 'date', label: '날짜', field: 'date', align: 'center' },
   { name: 'subjectName', label: '교과명', field: 'subjectName', align: 'center' },
   { name: 'attendance', label: '출석횟수', field: 'attendance', align: 'center' },
   { name: 'attendanceRate', label: '출석율(%)', field: 'attendanceRate', align: 'center' },
@@ -61,22 +150,16 @@ const getProfessorList = () => {
     })
 }
 
-// TODO Test data. You have to change below code and get only through API
 onMounted(() => {
-  dailyRateList.value = [
-    { index: 1, day: '2023-12-12', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' },
-    { index: 2, day: '2023-12-12', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' }
-  ]
-  monthRateList.value = [
-    { index: 1, day: '2023-12', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' },
-    { index: 2, day: '2023-12', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' }
-  ]
-  yearRateList.value = [
-    { index: 1, day: '2023', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' },
-    { index: 2, day: '2024', subjectName: '테스트', attendance: '1', attendanceRate: '15', perceptual: '3', perceptualRate: '24', absent: '12', absentRate: '14' }
-  ]
+  searchParam.dateType = 'day'
   getSubjectList()
   getProfessorList()
+})
+
+watchEffect(() => {
+  if (searchParam.date) {
+    searchParam.date = searchParam.date.replaceAll('/', '-')
+  }
 })
 </script>
 
@@ -93,7 +176,7 @@ onMounted(() => {
               </span>
                 <q-select
                   class="q-ml-sm q-mr-lg col-1"
-                  v-model="searchParam.professorName"
+                  v-model="searchParam.professorCode"
                   :options="options.professor"
                   map-options
                   emit-value
@@ -106,7 +189,7 @@ onMounted(() => {
               </span>
                 <q-select
                   class="q-ml-sm q-mr-lg col-1"
-                  v-model="searchParam.subjectName"
+                  v-model="searchParam.subjectCode"
                   :options="options.subject"
                   map-options
                   emit-value
@@ -143,16 +226,26 @@ onMounted(() => {
         flat
         bordered
         :columns="statisticsColumns"
-        :rows="dailyRateList"
+        :rows="statisticsRateList"
         row-key="index"
       >
+        <template #top-right>
+          <span class="text-red">소수 둘째 자리까지 표현됩니다.</span>
+        </template>
         <template #top-left>
-          <span class="title flex items-center q-ml-sm">
-              일별통계
-          </span>
+          <q-select
+            class="q-ml-sm q-mr-lg col-1"
+            v-model="searchParam.dateType"
+            :options="options.selectDateType"
+            map-options
+            emit-value
+            filled
+            dense
+            outlined
+          />
           <q-input
             class="q-ml-sm q-mr-lg"
-            v-model="searchParam.day"
+            v-model="searchParam.date"
             readonl
             filled
             use-input
@@ -163,88 +256,9 @@ onMounted(() => {
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">
                 <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="searchParam.day">
+                  <q-date v-model="searchParam.date">
                     <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="확인" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
-        </template>
-      </q-table>
-    </div>
-    <div class="full-width q-ma-lg">
-      <q-table
-        title="월별통계"
-        flat
-        bordered
-        :columns="statisticsColumns"
-        :rows="monthRateList"
-        row-key="index"
-      >
-        <template #top-left>
-          <span class="title flex items-center q-ml-sm">
-              월별통계
-          </span>
-          <q-input
-            class="q-ml-sm q-mr-lg"
-            v-model="searchParam.month"
-            readonl
-            filled
-            use-input
-            dense
-            outlined
-            mask="date"
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="searchParam.month">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="확인" color="primary" flat />
-                    </div>
-                  </q-date>
-                </q-popup-proxy>
-              </q-icon>
-            </template>
-          </q-input>
-        </template>
-      </q-table>
-    </div>
-    <div class="full-width q-ma-lg">
-      <q-table
-        title="년별통계"
-        flat
-        bordered
-        :rows="yearRateList"
-        :columns="statisticsColumns"
-        row-key="index"
-      >
-        <template #top-left>
-          <span class="title flex items-center q-ml-sm">
-              년별통계
-          </span>
-          <q-input
-            class="q-ml-sm q-mr-lg"
-            v-model="searchParam.year"
-            mask="date"
-            :default-year-month="[selectedYear, 1]"
-            :range="[1900, new Date().getFullYear()]"
-            :navigation="false"
-            readonl
-            filled
-            use-input
-            dense
-            outlined
-          >
-            <template v-slot:append>
-              <q-icon name="event" class="cursor-pointer">
-                <q-popup-proxy cover transition-show="scale" transition-hide="scale">
-                  <q-date v-model="searchParam.year">
-                    <div class="row items-center justify-end">
-                      <q-btn v-close-popup label="확인" color="primary" flat />
+                      <q-btn v-close-popup label="확인" color="primary" flat/>
                     </div>
                   </q-date>
                 </q-popup-proxy>
