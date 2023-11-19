@@ -6,13 +6,15 @@ const options = ref({
   professor: [],
   subject: [],
   selectDateType: [
-    { label: '일별', value: 'day' },
-    { label: '월별', value: 'month' },
-    { label: '년별', value: 'year' }
+    { label: '일', value: 'day' },
+    { label: '월', value: 'month' },
+    { label: '년', value: 'year' }
   ]
 })
 const statisticsRateList = ref([])
 const searchParam = reactive({})
+const convertDate = ref('')
+let preventDateStatus = ''
 const fnClickSearch = () => {
   api.get('/ysu/admin/total/statistics', { params: searchParam })
     .then((res) => {
@@ -149,6 +151,7 @@ const getProfessorList = () => {
 
 onMounted(() => {
   searchParam.dateType = 'day'
+  preventDateStatus = searchParam.dateType
   getSubjectList()
   getProfessorList()
 })
@@ -156,6 +159,21 @@ onMounted(() => {
 watchEffect(() => {
   if (searchParam.date) {
     searchParam.date = searchParam.date.replaceAll('/', '-')
+    if (searchParam.dateType === 'month') {
+      searchParam.date = searchParam.date.substring(0, 7)
+    }
+    if (searchParam.dateType === 'year') {
+      searchParam.date = searchParam.date.substring(0, 4)
+    }
+    convertDate.value = searchParam.date
+  }
+
+  if (searchParam.dateType) {
+    if (searchParam.dateType !== preventDateStatus) {
+      searchParam.date = undefined
+      convertDate.value = undefined
+    }
+    preventDateStatus = searchParam.dateType
   }
 })
 </script>
@@ -227,7 +245,7 @@ watchEffect(() => {
         row-key="index"
       >
         <template #top-right>
-          <span class="text-red">소수 둘째 자리까지 표현됩니다.</span>
+          <span class="text-red">소수 셋째 자리에서 반올림하여 비율합이 100%가 아닐 수 있습니다.</span>
         </template>
         <template #top-left>
           <q-select
@@ -242,13 +260,12 @@ watchEffect(() => {
           />
           <q-input
             class="q-ml-sm q-mr-lg"
-            v-model="searchParam.date"
+            v-model="convertDate"
             readonl
             filled
             use-input
             dense
             outlined
-            mask="date"
             >
             <template v-slot:append>
               <q-icon name="event" class="cursor-pointer">

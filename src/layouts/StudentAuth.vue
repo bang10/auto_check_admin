@@ -35,7 +35,6 @@ const fnClickSearch = () => {
           ...item
         }
       })
-      console.log(studentInfoList.value)
     })
     .catch((err) => {
       alert(err)
@@ -46,7 +45,6 @@ const fnDoAuth = () => {
   if (selectedItem.value.length === 0) {
     alert('한명 이상 선택해 주세요.')
   } else {
-    console.log(buildParam('auth'))
     api.post('/ysu/admin/update/student/statue', buildParam('auth'))
       .then((res) => {
         if (res.data.result > 0) {
@@ -115,7 +113,6 @@ const fnClickReset = () => {
 
 const fnClickRow = (event, param) => {
   clickedRowData.value = param
-  console.log(clickedRowData.value)
   nextTick(() => {
     window.open('/manage/attendance?studentId=' + param.studentId)
   })

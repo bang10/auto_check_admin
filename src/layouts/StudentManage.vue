@@ -50,7 +50,6 @@ const fnClickReset = () => {
 
 const fnClickRow = (event, param) => {
   clickedRowData.value = param
-  console.log(clickedRowData.value)
   nextTick(() => {
     window.open('/manage/attendance?studentId=' + param.studentId)
   })
