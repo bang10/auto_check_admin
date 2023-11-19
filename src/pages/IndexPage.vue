@@ -23,7 +23,7 @@ const linksList = [
     link: '/manage/attendance'
   },
   {
-    title: '통계(개발중)',
+    title: '통계',
     link: '/total/statistics'
   }
 ]
