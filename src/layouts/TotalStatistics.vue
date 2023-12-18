@@ -1,6 +1,7 @@
 <script setup>
-import { onMounted, reactive, ref, watchEffect } from 'vue'
+import { nextTick, onMounted, reactive, ref, watchEffect } from 'vue'
 import { api } from 'boot/axios'
+import Chart from 'chart.js/auto'
 
 const options = ref({
   professor: [],
@@ -14,6 +15,10 @@ const options = ref({
 const statisticsRateList = ref([])
 const searchParam = reactive({})
 const convertDate = ref('')
+const showDialog = ref(false)
+const selectedRowData = ref({})
+const chartRef = ref(null)
+
 let preventDateStatus = ''
 const fnClickSearch = () => {
   api.get('/ysu/admin/total/statistics', { params: searchParam })
@@ -151,11 +156,45 @@ const getProfessorList = () => {
     })
 }
 
+const rowClick = (param) => {
+  selectedRowData.value = param
+  // absent: 결석, attendanceRate: 출석, perceptual: 지각
+  if (!chartRef.value) return
+  const ctx = chartRef.value.getContext('2d')
+  if (!ctx) return
+  return new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['출석', '지각', '결석'],
+      dataSets: [{
+        label: '',
+        data: [param.attendanceRate, param.perceptualRate, param.absentRate],
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.7)',
+          'rgba(54, 162, 235, 0.7)',
+          'rgba(255, 206, 86, 0.7)'
+        ]
+      }],
+      borderWidth: 1
+    }
+  })
+}
+
+const showChart = (event, param) => {
+  showDialog.value = true
+
+  nextTick(() => {
+    rowClick(param)
+  })
+}
+
 onMounted(() => {
   searchParam.dateType = 'day'
   preventDateStatus = searchParam.dateType
+  searchParam.subjectCode = 'C0322'
   getSubjectList()
   getProfessorList()
+  fnClickSearch()
 })
 
 watchEffect(() => {
@@ -244,6 +283,7 @@ watchEffect(() => {
         bordered
         :columns="statisticsColumns"
         :rows="statisticsRateList"
+        @row-click="showChart"
         row-key="index"
       >
         <template #top-right>
@@ -285,4 +325,21 @@ watchEffect(() => {
       </q-table>
     </div>
   </div>
+
+  <q-dialog v-model="showDialog" transition-show="fade" transition-hide="fade">
+    <q-card>
+      <q-card-section>
+        <div class="text-h6">{{ selectedRowData.subjectName }} ({{ selectedRowData.date }})</div>
+      </q-card-section>
+      <q-card-section class="q-pt-none">
+        <!-- 원형 그래프 -->
+        <div class="chart-view">
+          <canvas ref="myChart" />
+        </div>
+      </q-card-section>
+      <q-card-section>
+        <q-btn flat label="확인" color="primary" v-close-popup />
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
