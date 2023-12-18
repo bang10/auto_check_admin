@@ -2,12 +2,14 @@
 import { onMounted, reactive, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from 'boot/axios'
+import {useStore} from "vuex";
 
 const selectedStudentId = ref('')
 const searchParam = reactive({})
 const attendanceList = ref([])
 const attendanceStudentList = ref([])
 const selectStudentList = ref([])
+const userStore = useStore()
 
 const attendanceStudentColumns = ref([
   { name: 'cnt', label: '순서', field: 'cnt', align: 'center' },
@@ -350,6 +352,7 @@ onMounted(async () => {
           />
 
           <q-btn
+            v-if="userStore.getters.getLoginData.division === '관리자'"
             class="q-ml-lg btn-style"
             dense
             flat
