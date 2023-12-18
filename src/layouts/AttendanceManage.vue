@@ -2,7 +2,7 @@
 import { onMounted, reactive, ref, watchEffect } from 'vue'
 import { useRoute } from 'vue-router'
 import { api } from 'boot/axios'
-import {useStore} from "vuex";
+import { useStore } from 'vuex'
 
 const selectedStudentId = ref('')
 const searchParam = reactive({})
