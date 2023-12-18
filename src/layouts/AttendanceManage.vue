@@ -48,6 +48,16 @@ const buildParam = (type) => {
   }
 }
 
+const deleteButton = () => {
+  api.post('/ysu/admin/delete/least/attendance')
+    .then(() => {
+      window.alert('모든 데이터가 삭제되었습니다.')
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
 const searchBuildParam = () => {
   return {
     studentId: searchParam.studentId,
@@ -337,6 +347,15 @@ onMounted(async () => {
             color="white"
             @click="fnAttendance('A03')"
             label="결석처리"
+          />
+
+          <q-btn
+            class="q-ml-lg btn-style"
+            dense
+            flat
+            color="white"
+            @click="deleteButton()"
+            label="모든 데이터 삭제"
           />
         </template>
       </q-table>
