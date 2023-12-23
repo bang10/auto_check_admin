@@ -1,11 +1,12 @@
 <script setup>
 import { nextTick, onMounted, reactive, ref, watchEffect } from 'vue'
 import { api } from 'boot/axios'
-import { useStore } from 'vuex'
+// import { useStore } from 'vuex'
 
 const searchParam = reactive({})
-const userStore = useStore()
+// const userStore = useStore()
 const scheduleList = ref([])
+const isAddSubject = ref(false)
 const scheduleInfoColumns = ref([
   { name: 'index', label: '순서', field: 'index', align: 'center' },
   { name: 'subjectName', label: '과목명', field: 'subjectName', align: 'center' },
@@ -16,30 +17,7 @@ const scheduleInfoColumns = ref([
   { name: 'professorId', label: '교수코드', field: 'professorId', align: 'center' }
 ])
 
-const clickedRowData = ref({})
-const fnClickSearch = () => {
-  if (userStore.getters.getLoginData.division === '관리자') {
-    api.get('/ysu/admin/schedule/manage', { params: searchBuildParam() })
-      .then((res) => {
-        scheduleList.value = res.data.result.map((item, index) => {
-          return {
-            index: index + 1,
-            tranceTime: traceTime(item.scheduleTime),
-            tranceDate: tranceDate(item.scheduleDay),
-            ...item
-          }
-        })
-      })
-      .catch((err) => {
-        alert('오류가 발생했습니다.')
-        console.error(err)
-      })
-  } else {
-    alert('권한이 없습니다.')
-  }
-}
-
-const options = {
+const options = ref({
   day: [
     { label: '월요일', value: 2 },
     { label: '화요일', value: 3 },
@@ -48,7 +26,62 @@ const options = {
     { label: '금요일', value: 6 },
     { label: '토요일', value: 7 },
     { label: '일요일', value: 1 }
-  ]
+  ],
+  professor: []
+})
+
+const clickedRowData = ref({})
+
+const getProfessorList = () => {
+  api.get('/ysu/professor/list')
+    .then((res) => {
+      options.value.professor = res.data.result.map(item => {
+        return {
+          label: item.name,
+          value: item.professorId
+        }
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+    })
+}
+
+const fnClickSearch = () => {
+  // if (userStore.getters.getLoginData.division === '관리자') {
+  //   api.get('/ysu/admin/schedule/manage', { params: searchBuildParam() })
+  //     .then((res) => {
+  //       scheduleList.value = res.data.result.map((item, index) => {
+  //         return {
+  //           index: index + 1,
+  //           tranceTime: traceTime(item.scheduleTime),
+  //           tranceDate: tranceDate(item.scheduleDay),
+  //           ...item
+  //         }
+  //       })
+  //     })
+  //     .catch((err) => {
+  //       alert('오류가 발생했습니다.')
+  //       console.error(err)
+  //     })
+  // } else {
+  //   alert('권한이 없습니다.')
+  // }
+  api.get('/ysu/admin/schedule/manage', { params: searchBuildParam() })
+    .then((res) => {
+      scheduleList.value = res.data.result.map((item, index) => {
+        return {
+          index: index + 1,
+          tranceTime: traceTime(item.scheduleTime),
+          tranceDate: tranceDate(item.scheduleDay),
+          ...item
+        }
+      })
+    })
+    .catch((err) => {
+      alert('오류가 발생했습니다.')
+      console.error(err)
+    })
 }
 
 const tranceDate = (param) => {
@@ -82,14 +115,14 @@ const searchBuildParam = () => {
     subjectName: searchParam.subjectName,
     scheduleDay: searchParam.scheduleDay,
     classroom: searchParam.classroom,
-    professorName: searchParam.professorName
+    professorCode: searchParam.professorCode
   }
 }
 const fnClickReset = () => {
   searchParam.subjectName = undefined
   searchParam.scheduleDay = undefined
   searchParam.classroom = undefined
-  searchParam.professorName = undefined
+  searchParam.professorCode = undefined
 
   fnClickSearch()
 }
@@ -108,8 +141,7 @@ const traceTime = (param) => {
     const minutes = timeParts[1].padStart(2, '0')
     return `${hours}:${minutes}`
   } else {
-    // 형식이 다르면 원래 문자열 반환
-    return '잘못된 형식'
+    return param
   }
 }
 
@@ -119,12 +151,23 @@ watchEffect(() => {
   }
 })
 
-onMounted(() => {
-  if (userStore.getters.getLoginData.division === '관리자') {
-    fnClickSearch()
+const fnAddSubject = () => {
+  isAddSubject.value = !isAddSubject.value
+  if (searchParam.subjectName && searchParam.scheduleDay && searchParam.classroom && searchParam.professorCode) {
+    window.alert('선택됨')
   } else {
-    alert('권한이 없습니다.')
+    window.alert('강의 추가는 모든 값이 필수 입니다.')
   }
+}
+
+onMounted(() => {
+  // if (userStore.getters.getLoginData.division === '관리자') {
+  //   fnClickSearch()
+  // } else {
+  //   alert('권한이 없습니다.')
+  // }
+  getProfessorList()
+  fnClickSearch()
 })
 </script>
 
@@ -179,22 +222,22 @@ onMounted(() => {
                 />
 
                 <span class="title flex items-center q-ml-sm">
-                    교수이름
+                    교수명
                 </span>
-                <q-input
-                  class="q-ml-sm"
-                  v-model="searchParam.professorName"
+                <q-select
+                  class="q-ml-sm q-mr-lg col-1"
+                  v-model="searchParam.professorCode"
+                  :options="options.professor"
+                  map-options
+                  emit-value
                   filled
-                  use-input
                   dense
                   outlined
-                  style="width: 200px;"
                 />
               </q-item>
             </div>
           </div>
         </div>
-      </div>
     </div>
 
     <div class="justify-center row">
@@ -210,6 +253,13 @@ onMounted(() => {
         color="orange-6"
         rounded
         @click="fnClickReset"
+      />
+      <q-btn
+        dense
+        class="q-ml-lg btn-style bg-orange-2"
+        flat
+        label="강의추가"
+        :onclick="fnAddSubject"
       />
     </div>
     <div class="full-width q-ma-lg" style="max-height: 500px; overflow-y: auto;">
@@ -232,4 +282,13 @@ onMounted(() => {
       </q-table>
     </div>
   </div>
+  </div>
 </template>
+
+<style scoped>
+.btn-style {
+  height: auto;
+  width: 100px;
+  font-size: 16px;
+}
+</style>
