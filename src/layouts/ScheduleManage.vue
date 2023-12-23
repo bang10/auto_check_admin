@@ -152,12 +152,15 @@ watchEffect(() => {
 })
 
 const fnAddSubject = () => {
-  isAddSubject.value = !isAddSubject.value
   if (searchParam.subjectName && searchParam.scheduleDay && searchParam.classroom && searchParam.professorCode) {
-    window.alert('선택됨')
+    fnClickSearch()
   } else {
     window.alert('강의 추가는 모든 값이 필수 입니다.')
   }
+}
+
+const changeMode = () => {
+  isAddSubject.value = !isAddSubject.value
 }
 
 onMounted(() => {
@@ -241,20 +244,23 @@ onMounted(() => {
     </div>
 
     <div class="justify-center row">
+      <div v-if="!isAddSubject">
+        <q-btn
+          label="검색"
+          color="blue-6"
+          rounded
+          @click="fnClickSearch"
+        />
+        <q-btn
+          class="q-ml-sm"
+          label="초기화"
+          color="orange-6"
+          rounded
+          @click="fnClickReset"
+        />
+      </div>
       <q-btn
-        label="검색"
-        color="blue-6"
-        rounded
-        @click="fnClickSearch"
-      />
-      <q-btn
-        class="q-ml-sm"
-        label="초기화"
-        color="orange-6"
-        rounded
-        @click="fnClickReset"
-      />
-      <q-btn
+        v-if="isAddSubject"
         dense
         class="q-ml-lg btn-style bg-orange-2"
         flat
@@ -278,6 +284,25 @@ onMounted(() => {
           >
             검색결과 : {{ scheduleList.length }}개
           </q-item>
+        </template>
+        <template #top-right>
+          <span class="q-ml-lg">버튼을 클릭하면 변경됩니다.</span>
+          <q-btn
+            v-if="!isAddSubject"
+            class="btn-style bg-blue-3"
+            dense
+            flat
+            label="검색모드"
+            :onclick="changeMode"
+          />
+          <q-btn
+            v-if="isAddSubject"
+            class="btn-style bg-orange-2"
+            dense
+            flat
+            label="추가모드"
+            :onclick="changeMode"
+          />
         </template>
       </q-table>
     </div>
